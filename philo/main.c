@@ -6,15 +6,54 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/02/19 12:17:05 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/02/20 22:23:18 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	lyceum(int *dir)
+void	lyceum(int *dir, int size)
 {
-	(void)dir;
+	int	i;
+
+	i = 0;
+	while (i < size)
+		printf("%d\n", dir[i++]);
+}
+
+int	ft_strlen(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+int	intmaxmin(char *str)
+{
+	int	i;
+	int	nb;
+	int	n;
+
+	if (ft_strlen(str) > 11)
+		return (1);
+	i = 0;
+	nb = 0;
+	n = 1;
+	if (str[i] == '-')
+	{
+		i++;
+		n = -1;
+	}
+	while (str[i] && (i < 9 || (n == -1 && i < 10)))
+		nb = nb * 10 + (n * (str[i++] - 48));
+	if (nb > 214748364 || nb < -214748364)
+		return (1);
+	else if (nb == 214748364 && ((n == -1 && str[i] > '8') || str[i] > '7'))
+		return (1);
+	return (0);
 }
 
 int	ft_isdigit(char *str)
@@ -26,6 +65,8 @@ int	ft_isdigit(char *str)
 	{
 		if (str[i] < '0' || str[i] > '9')
 			return (0);
+		if (i > 8 && intmaxmin(str))
+			return (0);
 		i++;
 	}
 	return (1);
@@ -34,18 +75,20 @@ int	ft_isdigit(char *str)
 int	ft_atoi(char *str)
 {
 	int	i;
+	int	nb;
 	int	n;
 
 	i = 0;
+	n = 1;
 	if (str[i] == '-')
-		i++;
-	n = 0;
-	while (str[i])
 	{
-		n = n * 10 + (str[i++] - 48);
+		i++;
+		n = -1;
 	}
-	//missing sign
-	return (n);
+	nb = 0;
+	while (str[i])
+		nb = nb * 10 + (n * (str[i++] - 48));
+	return (nb);
 }
 
 int	main(int argc, char **argv)
@@ -65,7 +108,7 @@ int	main(int argc, char **argv)
 			}
 			dir[i -1] = ft_atoi(argv[i]);
 		}
-		lyceum(dir);
+		lyceum(dir, argc - 1);
 		return (0);
 	}
 	printf("ERROR: expected:./philo [#of philosophers] ");
