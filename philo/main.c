@@ -6,19 +6,37 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/02/20 22:23:18 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/02/23 15:02:40 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	lyceum(int *dir, int size)
+void	*life(void *dir)
 {
-	int	i;
+	int i;
+	int *tmp;
 
 	i = 0;
-	while (i < size)
-		printf("%d\n", dir[i++]);
+	tmp = (int *)dir;
+	while (i < 4)
+		printf("life: %d\n", tmp[i++]);
+	return (0);
+}
+
+void	lyceum(int *dir, int size)
+{
+	//int	i;
+	struct timeval	time;
+	pthread_t	philosopher;
+
+	(void)size;
+	gettimeofday(&time, NULL);
+	printf("time: %ld\n", time.tv_usec);
+	//i = 0;
+	//while (i++ < dir[0])
+	pthread_create(&philosopher, NULL, &life, dir);
+	pthread_join(philosopher, NULL);
 }
 
 int	ft_strlen(char *str)

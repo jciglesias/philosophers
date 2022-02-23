@@ -6,7 +6,7 @@
 #    By: jiglesia <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/09 12:55:34 by jiglesia          #+#    #+#              #
-#    Updated: 2022/02/20 11:52:54 by jiglesia         ###   ########.fr        #
+#    Updated: 2022/02/23 12:36:07 by jiglesia         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -64,10 +64,10 @@ CFLAGS		=
 CFLAGS		=	-Wall -Wextra -Werror -ansi -pedantic -g
 	endif
 else
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror -pthread
 endif
 
-CC			=	/usr/bin/clang
+CC			=	/usr/bin/gcc
 RM			=	/bin/rm -f
 ECHO		=	/bin/echo -e
 
