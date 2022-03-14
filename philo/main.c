@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/02/23 15:02:40 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/13 23:49:26 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void	*life(void *dir)
 
 	i = 0;
 	tmp = (int *)dir;
+	//pthread_mutex_lock()
 	while (i < 4)
 		printf("life: %d\n", tmp[i++]);
 	return (0);
@@ -28,15 +29,26 @@ void	lyceum(int *dir, int size)
 {
 	//int	i;
 	struct timeval	time;
-	pthread_t	philosopher;
+	t_philo	p;
 
 	(void)size;
+	(void)dir;
+	//p.philosopher[0] = 0;
+	//p.philosopher[1] = 0;
+	//p.index = 0;
+	//p.index++;
+	//p.index++;
 	gettimeofday(&time, NULL);
 	printf("time: %ld\n", time.tv_usec);
+	//printf("%d\n", p.index);
 	//i = 0;
 	//while (i++ < dir[0])
-	pthread_create(&philosopher, NULL, &life, dir);
-	pthread_join(philosopher, NULL);
+	pthread_create(&p.philosopher[0], NULL, &life, dir);
+	//pthread_mutex_init(&(p.mutex[0]),NULL);
+	pthread_create(&(p.philosopher[1]), NULL, &life, dir);
+	//pthread_mutex_init(&(p.mutex[1]),NULL);
+	pthread_join(p.philosopher[0], NULL);
+	pthread_join(p.philosopher[1], NULL);
 }
 
 int	ft_strlen(char *str)
