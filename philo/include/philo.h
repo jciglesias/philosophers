@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/13 23:46:12 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/14 18:28:48 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,14 @@
 
 typedef struct	s_philos
 {
-	pthread_t		philosopher[2];//[2147483647];
-	pthread_mutex_t	mutex[2];//[2147483647];
-	int				index;
+	pthread_t		philosopher[10000];
+	pthread_mutex_t	mutex[10000];
+	int				n_inst;
+	int				n_forks;
+	int				t_to_die;
+	int				t_to_eat;
+	int				t_to_sleep;
+	int				pos;
 }				t_philo;
 
 #endif

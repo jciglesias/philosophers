@@ -6,49 +6,47 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/13 23:49:26 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/14 18:43:31 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*life(void *dir)
+void	*life(void *p)
 {
-	int i;
-	int *tmp;
+	t_philo *tmp;
+	int		pos;
 
-	i = 0;
-	tmp = (int *)dir;
+	tmp = (t_philo *)p;
+	pos = tmp->pos++;
 	//pthread_mutex_lock()
-	while (i < 4)
-		printf("life: %d\n", tmp[i++]);
+	printf("%d\n", pos);
 	return (0);
 }
 
 void	lyceum(int *dir, int size)
 {
-	//int	i;
+	int	i;
 	struct timeval	time;
 	t_philo	p;
 
-	(void)size;
-	(void)dir;
-	//p.philosopher[0] = 0;
-	//p.philosopher[1] = 0;
-	//p.index = 0;
-	//p.index++;
-	//p.index++;
+	p.n_inst = size;
+	p.n_forks = dir[0];
+	p.t_to_die = dir[1];
+	p.t_to_eat = dir[2];
+	p.t_to_sleep = dir[3];
+	p.pos = 0;
 	gettimeofday(&time, NULL);
 	printf("time: %ld\n", time.tv_usec);
-	//printf("%d\n", p.index);
-	//i = 0;
-	//while (i++ < dir[0])
-	pthread_create(&p.philosopher[0], NULL, &life, dir);
-	//pthread_mutex_init(&(p.mutex[0]),NULL);
-	pthread_create(&(p.philosopher[1]), NULL, &life, dir);
-	//pthread_mutex_init(&(p.mutex[1]),NULL);
-	pthread_join(p.philosopher[0], NULL);
-	pthread_join(p.philosopher[1], NULL);
+	i = 0;
+	while (i < dir[0])
+		pthread_mutex_init(&(p.mutex[i++]),NULL);
+	i = 0;
+	while (i < dir[0])
+		pthread_create(&p.philosopher[i++], NULL, &life, &p);
+	i = 0;
+	while (i < dir[0])
+		pthread_join(p.philosopher[i++], NULL);
 }
 
 int	ft_strlen(char *str)
