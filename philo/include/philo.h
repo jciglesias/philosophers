@@ -24,6 +24,7 @@ typedef struct	s_philos
 	pthread_mutex_t	mutex[10000];
 	int				n_inst;
 	int				n_forks;
+ 	int				n_to_eat;
 	int				t_to_die;
 	int				t_to_eat;
 	int				t_to_sleep;

@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/14 18:43:31 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/15 17:52:18 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,34 @@ void	*life(void *p)
 {
 	t_philo *tmp;
 	int		pos;
+	struct timeval	time;
 
 	tmp = (t_philo *)p;
 	pos = tmp->pos++;
-	//pthread_mutex_lock()
-	printf("%d\n", pos);
+	pthread_mutex_lock(&tmp->mutex[pos]);
+	gettimeofday(&time, NULL);
+	printf("%d philosopher %d has taken a fork\n", time.tv_usec, pos);
+	if (pos < tmp->n_forks)
+		pthread_mutex_lock(&tmp->mutex[pos + 1]);
+	else
+		pthread_mutex_lock(&tmp->mutex[0]);
+	gettimeofday(&time, NULL);
+	printf("%d philosopher %d is eating\n", time.tv_usec, pos);
+	usleep(tmp->t_to_eat * 1000);
+	pthread_mutex_unlock(&tmp->mutex[pos]);
+	if (pos < tmp->n_forks)
+		pthread_mutex_unlock(&tmp->mutex[pos + 1]);
+	else
+		pthread_mutex_unlock(&tmp->mutex[0]);
+	gettimeofday(&time, NULL);
+	printf("%d philosopher %d is sleeping\n", time.tv_usec, pos);
+	usleep(tmp->t_to_sleep * 1000);
 	return (0);
 }
 
 void	lyceum(int *dir, int size)
 {
 	int	i;
-	struct timeval	time;
 	t_philo	p;
 
 	p.n_inst = size;
@@ -35,9 +51,10 @@ void	lyceum(int *dir, int size)
 	p.t_to_die = dir[1];
 	p.t_to_eat = dir[2];
 	p.t_to_sleep = dir[3];
+	p.n_to_eat = -1;
+	if (size == 5)
+		p.n_to_eat = dir[4];
 	p.pos = 0;
-	gettimeofday(&time, NULL);
-	printf("time: %ld\n", time.tv_usec);
 	i = 0;
 	while (i < dir[0])
 		pthread_mutex_init(&(p.mutex[i++]),NULL);
