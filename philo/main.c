@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/17 20:33:12 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/18 14:45:23 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,29 @@ void	*life(void *p)
 
 	tmp = (t_philo *)p;
 	pos = tmp->pos++;
-	pthread_mutex_lock(&tmp->mutex[pos]);
-	gettimeofday(&time, NULL);
-	printf("%ld philosopher %d has taken a fork\n", time.tv_usec, pos);
-	if (pos < tmp->n_forks)
-		pthread_mutex_lock(&tmp->mutex[pos + 1]);
-	else
-		pthread_mutex_lock(&tmp->mutex[0]);
-	gettimeofday(&time, NULL);
-	printf("%ld philosopher %d is eating\n", time.tv_usec, pos);
-	usleep(tmp->t_to_eat * 1000);
-	pthread_mutex_unlock(&tmp->mutex[pos]);
-	if (pos < tmp->n_forks)
-		pthread_mutex_unlock(&tmp->mutex[pos + 1]);
-	else
-		pthread_mutex_unlock(&tmp->mutex[0]);
-	gettimeofday(&time, NULL);
-	printf("%ld philosopher %d is sleeping\n", time.tv_usec, pos);
-	usleep(tmp->t_to_sleep * 1000);
+	int i = 0;
+	while (i < 3)
+	{
+		pthread_mutex_lock(&tmp->mutex[pos]);
+		gettimeofday(&time, NULL);
+		printf("%ld philosopher %d has taken a fork\n", time.tv_usec, pos);
+		if (pos < (tmp->n_forks - 1))
+			pthread_mutex_lock(&tmp->mutex[pos + 1]);
+		else
+			pthread_mutex_lock(&tmp->mutex[0]);
+		gettimeofday(&time, NULL);
+		printf("%ld philosopher %d is eating\n", time.tv_usec, pos);
+		usleep(tmp->t_to_eat * 1000);
+		pthread_mutex_unlock(&tmp->mutex[pos]);
+		if (pos < (tmp->n_forks - 1))
+			pthread_mutex_unlock(&tmp->mutex[pos + 1]);
+		else
+			pthread_mutex_unlock(&tmp->mutex[0]);
+		gettimeofday(&time, NULL);
+		printf("%ld philosopher %d is sleeping\n", time.tv_usec, pos);
+		usleep(tmp->t_to_sleep * 1000);
+		i++;
+	}
 	return (0);
 }
 
