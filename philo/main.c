@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/16 22:46:09 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/17 20:33:12 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,10 @@ void	lyceum(int *dir, int size)
 		pthread_mutex_init(&(p.mutex[i++]),NULL);
 	i = 0;
 	while (i < dir[0])
+	{
 		pthread_create(&p.philosopher[i++], NULL, &life, &p);
+		usleep(5);
+	}
 	i = 0;
 	while (i < dir[0])
 		pthread_join(p.philosopher[i++], NULL);
