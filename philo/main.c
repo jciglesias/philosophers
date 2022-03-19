@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/19 18:09:02 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/19 19:21:30 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	*kill_philosopher(t_philo *p, int pos, int time)
 {
-	printf("%d philosopher %d died\n", time, pos);
+	printf("%d philosopher %d died\n", time, pos + 1);
 	pthread_mutex_unlock(&p->mutex[pos]);
 	if (pos < (p->n_forks - 1))
 		pthread_mutex_unlock(&p->mutex[pos + 1]);
@@ -41,7 +41,7 @@ void	*life(void *p)
 	{
 		pthread_mutex_lock(&tmp->mutex[pos]);
 		gettimeofday(&time, NULL);
-		printf("%ld philosopher %d has taken a fork\n", time.tv_usec / 1000, pos);
+		printf("%ld philosopher %d has taken a fork\n", time.tv_usec / 1000, pos + 1);
 		if (pos < (tmp->n_forks - 1))
 			pthread_mutex_lock(&tmp->mutex[pos + 1]);
 		else
@@ -50,7 +50,7 @@ void	*life(void *p)
 		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000))
 			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
 		starve = time.tv_usec;
-		printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos);
+		printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos + 1);
 		lunchs--;
 		usleep(tmp->t_to_eat * 1000);
 		pthread_mutex_unlock(&tmp->mutex[pos]);
@@ -59,14 +59,14 @@ void	*life(void *p)
 		else
 			pthread_mutex_unlock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
-		printf("%ld philosopher %d is sleeping\n", time.tv_usec / 1000, pos);
-		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000 + tmp->t_to_sleep))
+		printf("%ld philosopher %d is sleeping\n", time.tv_usec / 1000, pos + 1);
+		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000 - tmp->t_to_sleep))
 			return (kill_philosopher(tmp, pos, (time.tv_usec + (tmp->t_to_die * 1000)) / 1000));
 		usleep(tmp->t_to_sleep * 1000);
 		gettimeofday(&time, NULL);
-		if ((time.tv_usec - starve) > tmp->t_to_die * 1000)
+		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000))
 			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
-		printf("%ld philosopher %d is thinking\n", time.tv_usec / 1000, pos);
+		printf("%ld philosopher %d is thinking\n", time.tv_usec / 1000, pos + 1);
 	}
 	return (0);
 }
