@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/14 18:28:48 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/19 18:05:06 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct	s_philos
 	int				t_to_eat;
 	int				t_to_sleep;
 	int				pos;
+	int				alive;
 }				t_philo;
 
 #endif

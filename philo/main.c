@@ -6,32 +6,52 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/18 14:45:23 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/19 18:09:02 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	*kill_philosopher(t_philo *p, int pos, int time)
+{
+	printf("%d philosopher %d died\n", time, pos);
+	pthread_mutex_unlock(&p->mutex[pos]);
+	if (pos < (p->n_forks - 1))
+		pthread_mutex_unlock(&p->mutex[pos + 1]);
+	else
+		pthread_mutex_unlock(&p->mutex[0]);
+	p->alive = 0;
+	return (0);
+}
 
 void	*life(void *p)
 {
 	t_philo *tmp;
 	int		pos;
 	struct timeval	time;
+	int		starve;
+	int		lunchs;
 
 	tmp = (t_philo *)p;
 	pos = tmp->pos++;
-	int i = 0;
-	while (i < 3)
+	gettimeofday(&time, NULL);
+	starve = time.tv_usec;
+	lunchs = tmp->n_to_eat;
+	while (lunchs && tmp->alive)
 	{
 		pthread_mutex_lock(&tmp->mutex[pos]);
 		gettimeofday(&time, NULL);
-		printf("%ld philosopher %d has taken a fork\n", time.tv_usec, pos);
+		printf("%ld philosopher %d has taken a fork\n", time.tv_usec / 1000, pos);
 		if (pos < (tmp->n_forks - 1))
 			pthread_mutex_lock(&tmp->mutex[pos + 1]);
 		else
 			pthread_mutex_lock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
-		printf("%ld philosopher %d is eating\n", time.tv_usec, pos);
+		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000))
+			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
+		starve = time.tv_usec;
+		printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos);
+		lunchs--;
 		usleep(tmp->t_to_eat * 1000);
 		pthread_mutex_unlock(&tmp->mutex[pos]);
 		if (pos < (tmp->n_forks - 1))
@@ -39,9 +59,14 @@ void	*life(void *p)
 		else
 			pthread_mutex_unlock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
-		printf("%ld philosopher %d is sleeping\n", time.tv_usec, pos);
+		printf("%ld philosopher %d is sleeping\n", time.tv_usec / 1000, pos);
+		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000 + tmp->t_to_sleep))
+			return (kill_philosopher(tmp, pos, (time.tv_usec + (tmp->t_to_die * 1000)) / 1000));
 		usleep(tmp->t_to_sleep * 1000);
-		i++;
+		gettimeofday(&time, NULL);
+		if ((time.tv_usec - starve) > tmp->t_to_die * 1000)
+			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
+		printf("%ld philosopher %d is thinking\n", time.tv_usec / 1000, pos);
 	}
 	return (0);
 }
@@ -57,6 +82,7 @@ void	lyceum(int *dir, int size)
 	p.t_to_eat = dir[2];
 	p.t_to_sleep = dir[3];
 	p.n_to_eat = -1;
+	p.alive = 1;
 	if (size == 5)
 		p.n_to_eat = dir[4];
 	p.pos = 0;
