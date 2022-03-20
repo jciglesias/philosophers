@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/20 15:11:27 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/20 15:57:29 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ void	*life(void *p)
 	lunchs = tmp->n_to_eat;
 	while (lunchs && tmp->alive)
 	{
+		if (!tmp->alive)
+			return (0);
 		pthread_mutex_lock(&tmp->mutex[pos]);
 		gettimeofday(&time, NULL);
 		printf("%ld philosopher %d has taken a fork\n", time.tv_usec / 1000, pos + 1);
@@ -46,8 +48,6 @@ void	*life(void *p)
 		else
 			pthread_mutex_lock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
-		if (!tmp->alive)
-			return (0);
 		tmp->starve[pos] = time.tv_usec;
 		printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos + 1);
 		lunchs--;
@@ -108,7 +108,7 @@ void	lyceum(int *dir, int size)
 		while (i < dir[0])
 		{
 			gettimeofday(&time, NULL);
-			if ((time.tv_usec - p.starve[i]) > (p.t_to_die * 1000))
+			if ((time.tv_usec - p.starve[i]) >= (p.t_to_die * 1000))
 			{
 				kill_philosopher(&p, i, time.tv_usec / 1000);
 				break ;
@@ -119,76 +119,6 @@ void	lyceum(int *dir, int size)
 	i = 0;
 	while (i < dir[0])
 		pthread_join(p.philosopher[i++], NULL);
-}
-
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-
-int	intmaxmin(char *str)
-{
-	int	i;
-	int	nb;
-	int	n;
-
-	if (ft_strlen(str) > 11)
-		return (1);
-	i = 0;
-	nb = 0;
-	n = 1;
-	if (str[i] == '-')
-	{
-		i++;
-		n = -1;
-	}
-	while (str[i] && (i < 9 || (n == -1 && i < 10)))
-		nb = nb * 10 + (n * (str[i++] - 48));
-	if (nb > 214748364 || nb < -214748364)
-		return (1);
-	else if (nb == 214748364 && ((n == -1 && str[i] > '8') || str[i] > '7'))
-		return (1);
-	return (0);
-}
-
-int	ft_isdigit(char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] < '0' || str[i] > '9')
-			return (0);
-		if (i > 8 && intmaxmin(str))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-int	ft_atoi(char *str)
-{
-	int	i;
-	int	nb;
-	int	n;
-
-	i = 0;
-	n = 1;
-	if (str[i] == '-')
-	{
-		i++;
-		n = -1;
-	}
-	nb = 0;
-	while (str[i])
-		nb = nb * 10 + (n * (str[i++] - 48));
-	return (nb);
 }
 
 int	main(int argc, char **argv)

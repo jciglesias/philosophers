@@ -6,7 +6,7 @@
 #    By: jiglesia <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/09 12:55:34 by jiglesia          #+#    #+#              #
-#    Updated: 2022/02/23 12:36:07 by jiglesia         ###   ########.fr        #
+#    Updated: 2022/03/20 16:02:32 by jiglesia         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -27,7 +27,7 @@ INC_LIB		=	#$(INCFT)/libft.a
 
 #***************** SRC* *******************#
 
-DIRSRC		=	.
+DIRSRC		=	./srcs
 DIRCHEC		=
 DIRMV		=
 DIRINPUT	=
@@ -35,7 +35,7 @@ DIRLIST		=
 DIRQ_SORT	=
 DIRLASER	=
 
-SRC			=	main.c
+SRC			=	main.c libft.c
 CHECKER		=
 MOVES		=
 INPUT		=
