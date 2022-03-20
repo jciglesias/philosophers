@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/20 16:15:22 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/20 16:45:18 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,21 @@ void	*life(void *p)
 			return (0);
 		pthread_mutex_lock(&tmp->mutex[pos]);
 		gettimeofday(&time, NULL);
-		printf("%ld philosopher %d has taken a fork\n", time.tv_usec / 1000, pos + 1);
+		if (tmp->alive)
+			printf("%ld philosopher %d has taken a fork\n", time.tv_usec / 1000, pos + 1);
+		if (tmp->n_forks < 2)
+		{
+			usleep(tmp->t_to_die * 1000);
+			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
+		}
 		if (pos < (tmp->n_forks - 1))
 			pthread_mutex_lock(&tmp->mutex[pos + 1]);
 		else
 			pthread_mutex_lock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
 		tmp->starve[pos] = time.tv_usec;
-		printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos + 1);
+		if (tmp->alive)
+			printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos + 1);
 		lunchs--;
 		usleep(tmp->t_to_eat * 1000);
 		pthread_mutex_unlock(&tmp->mutex[pos]);
