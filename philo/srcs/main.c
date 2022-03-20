@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/20 15:57:29 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/20 16:15:22 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,10 @@ void	*kill_philosopher(t_philo *p, int pos, int time)
 
 void	*life(void *p)
 {
-	t_philo *tmp;
-	int		pos;
+	t_philo			*tmp;
+	int				pos;
 	struct timeval	time;
-	int		lunchs;
+	int				lunchs;
 
 	tmp = (t_philo *)p;
 	pos = tmp->pos++;
@@ -76,8 +76,8 @@ void	*life(void *p)
 
 void	lyceum(int *dir, int size)
 {
-	int	i;
-	t_philo	p;
+	int				i;
+	t_philo			p;
 	struct timeval	time;
 
 	p.n_inst = size;
@@ -93,7 +93,7 @@ void	lyceum(int *dir, int size)
 	p.pos = 0;
 	i = 0;
 	while (i < dir[0])
-		pthread_mutex_init(&(p.mutex[i++]),NULL);
+		pthread_mutex_init(&(p.mutex[i++]), NULL);
 	i = 0;
 	while (i < dir[0])
 	{
