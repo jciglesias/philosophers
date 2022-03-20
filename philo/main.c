@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/19 19:34:24 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/20 15:11:27 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,12 @@ void	*life(void *p)
 	t_philo *tmp;
 	int		pos;
 	struct timeval	time;
-	int		starve;
 	int		lunchs;
 
 	tmp = (t_philo *)p;
 	pos = tmp->pos++;
 	gettimeofday(&time, NULL);
-	starve = time.tv_usec;
+	tmp->starve[pos] = time.tv_usec;
 	lunchs = tmp->n_to_eat;
 	while (lunchs && tmp->alive)
 	{
@@ -47,9 +46,9 @@ void	*life(void *p)
 		else
 			pthread_mutex_lock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
-		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000))
-			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
-		starve = time.tv_usec;
+		if (!tmp->alive)
+			return (0);
+		tmp->starve[pos] = time.tv_usec;
 		printf("%ld philosopher %d is eating\n", time.tv_usec / 1000, pos + 1);
 		lunchs--;
 		usleep(tmp->t_to_eat * 1000);
@@ -59,15 +58,19 @@ void	*life(void *p)
 		else
 			pthread_mutex_unlock(&tmp->mutex[0]);
 		gettimeofday(&time, NULL);
+		if (!tmp->alive)
+			return (0);
 		printf("%ld philosopher %d is sleeping\n", time.tv_usec / 1000, pos + 1);
-		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000 - tmp->t_to_sleep))
-			return (kill_philosopher(tmp, pos, (time.tv_usec + (tmp->t_to_die * 1000)) / 1000));
+		if ((time.tv_usec - tmp->starve[pos]) > (tmp->t_to_die * 1000 - tmp->t_to_sleep))
+			return (0);
 		usleep(tmp->t_to_sleep * 1000);
 		gettimeofday(&time, NULL);
-		if ((time.tv_usec - starve) > (tmp->t_to_die * 1000))
-			return (kill_philosopher(tmp, pos, time.tv_usec / 1000));
+		if (!tmp->alive)
+			return (0);
 		printf("%ld philosopher %d is thinking\n", time.tv_usec / 1000, pos + 1);
 	}
+	if (!lunchs)
+		tmp->lunchs = 0;
 	return (0);
 }
 
@@ -75,6 +78,7 @@ void	lyceum(int *dir, int size)
 {
 	int	i;
 	t_philo	p;
+	struct timeval	time;
 
 	p.n_inst = size;
 	p.n_forks = dir[0];
@@ -83,6 +87,7 @@ void	lyceum(int *dir, int size)
 	p.t_to_sleep = dir[3];
 	p.n_to_eat = -1;
 	p.alive = 1;
+	p.lunchs = 1;
 	if (size == 5)
 		p.n_to_eat = dir[4];
 	p.pos = 0;
@@ -92,8 +97,24 @@ void	lyceum(int *dir, int size)
 	i = 0;
 	while (i < dir[0])
 	{
+		gettimeofday(&time, NULL);
+		p.starve[i] = time.tv_usec;
 		pthread_create(&p.philosopher[i++], NULL, &life, &p);
 		usleep(5);
+	}
+	while (p.alive && p.lunchs)
+	{
+		i = 0;
+		while (i < dir[0])
+		{
+			gettimeofday(&time, NULL);
+			if ((time.tv_usec - p.starve[i]) > (p.t_to_die * 1000))
+			{
+				kill_philosopher(&p, i, time.tv_usec / 1000);
+				break ;
+			}
+			i++;
+		}
 	}
 	i = 0;
 	while (i < dir[0])
