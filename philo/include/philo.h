@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/20 15:59:56 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/21 13:24:39 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,18 +25,21 @@ typedef struct s_philos
 	int				n_inst;
 	int				n_forks;
 	int				n_to_eat;
-	int				t_to_die;
-	int				t_to_eat;
-	int				t_to_sleep;
+	long			t_to_die;
+	long			t_to_eat;
+	long			t_to_sleep;
 	int				pos;
 	int				alive;
-	int				starve[10000];
+	long			starve[10000];
 	int				lunchs;
 }	t_philo;
 
-int	ft_atoi(char *str);
-int	ft_isdigit(char *str);
-int	intmaxmin(char *str);
-int	ft_strlen(char *str);
+int		ft_atoi(char *str);
+int		ft_isdigit(char *str);
+int		intmaxmin(char *str);
+int		ft_strlen(char *str);
+void	*kill_philosopher(t_philo *p, int pos, long time);
+void	*life(void *p);
+long	time_ms(struct timeval time);
 
 #endif
