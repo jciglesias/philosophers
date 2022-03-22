@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/21 13:25:01 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/22 01:14:30 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,18 @@
 
 void	*kill_philosopher(t_philo *p, int pos, long time)
 {
-	printf("%ld philosopher %d died\n", time, pos + 1);
+	p->alive = 0;
+	printf("%ld %d died\n", time - p->start, pos + 1);
 	pthread_mutex_unlock(&p->mutex[pos]);
 	if (pos < (p->n_forks - 1))
 		pthread_mutex_unlock(&p->mutex[pos + 1]);
 	else
 		pthread_mutex_unlock(&p->mutex[0]);
-	p->alive = 0;
 	return (0);
 }
 
 void	t_philoinit(t_philo *p, int *dir, int size)
 {
-	p->n_inst = size;
 	p->n_forks = dir[0];
 	p->t_to_die = dir[1];
 	p->t_to_eat = dir[2];
@@ -50,7 +49,7 @@ void	livecheck(t_philo *p, struct timeval time)
 		while (i < p->n_forks)
 		{
 			gettimeofday(&time, NULL);
-			if ((time_ms(time) - p->starve[i]) >= (p->t_to_die))
+			if ((time_ms(time) - p->starve[i]) > (p->t_to_die))
 			{
 				kill_philosopher(p, i, time_ms(time));
 				break ;
@@ -71,6 +70,8 @@ void	lyceum(int *dir, int size)
 	while (i < dir[0])
 		pthread_mutex_init(&(p.mutex[i++]), NULL);
 	i = 0;
+	gettimeofday(&time, NULL);
+	p.start = time_ms(time);
 	while (i < dir[0])
 	{
 		gettimeofday(&time, NULL);
