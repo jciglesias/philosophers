@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/22 01:11:01 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/25 12:03:48 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,9 @@ int	time_to_eat(t_philo *tmp, int pos, struct timeval time)
 	{
 		gettimeofday(&time, NULL);
 		printf("%ld %d has taken a fork\n", time_ms(time) - tmp->start, pos + 1);
-	}
-	tmp->starve[pos] = time_ms(time);
-	if (tmp->alive)
+		tmp->starve[pos] = time_ms(time);
 		printf("%ld %d is eating\n", time_ms(time) - tmp->start, pos + 1);
+	}
 	return (0);
 }
 
@@ -64,7 +63,8 @@ int	after_meal(t_philo *tmp, int pos, struct timeval time)
 	gettimeofday(&time, NULL);
 	if (!tmp->alive)
 		return (1);
-	printf("%ld %d is thinking\n", time_ms(time) - tmp->start, pos + 1);
+	if (tmp->alive)
+		printf("%ld %d is thinking\n", time_ms(time) - tmp->start, pos + 1);
 	return (0);
 }
 

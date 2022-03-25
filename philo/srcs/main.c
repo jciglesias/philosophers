@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/22 01:14:30 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/25 12:04:42 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@ void	t_philoinit(t_philo *p, int *dir, int size)
 	p->t_to_eat = dir[2];
 	p->t_to_sleep = dir[3];
 	p->n_to_eat = -1;
-	p->alive = 1;
-	p->lunchs = 1;
 	if (size == 5)
 		p->n_to_eat = dir[4];
+	p->alive = 1;
+	p->lunchs = 1;
 	p->pos = 0;
 }
 
@@ -51,6 +51,7 @@ void	livecheck(t_philo *p, struct timeval time)
 			gettimeofday(&time, NULL);
 			if ((time_ms(time) - p->starve[i]) > (p->t_to_die))
 			{
+				p->alive = 0;
 				kill_philosopher(p, i, time_ms(time));
 				break ;
 			}
