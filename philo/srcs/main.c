@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/25 12:04:42 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/26 00:12:36 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@ void	t_philoinit(t_philo *p, int *dir, int size)
 	p->n_to_eat = -1;
 	if (size == 5)
 		p->n_to_eat = dir[4];
+	p->philosopher = malloc(sizeof(pthread_t) * dir[0]);
+	p->mutex = malloc(sizeof(pthread_mutex_t) * dir[0]);
+	p->starve = malloc(sizeof(long) * dir[0]);
 	p->alive = 1;
 	p->lunchs = 1;
 	p->pos = 0;
@@ -84,6 +87,9 @@ void	lyceum(int *dir, int size)
 	i = 0;
 	while (i < dir[0])
 		pthread_join(p.philosopher[i++], NULL);
+	free(p.philosopher);
+	free(p.mutex);
+	free(p.starve);
 }
 
 int	main(int argc, char **argv)
