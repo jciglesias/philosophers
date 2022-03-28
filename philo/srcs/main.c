@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/26 00:12:36 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/28 14:54:39 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	lyceum(int *dir, int size)
 	while (i < dir[0])
 	{
 		gettimeofday(&time, NULL);
-		p.starve[i] = time.tv_usec;
+		p.starve[i] = time_ms(time);
 		pthread_create(&p.philosopher[i++], NULL, &life, &p);
 		usleep(5);
 	}
