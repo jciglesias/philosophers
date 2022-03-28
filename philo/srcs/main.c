@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/28 15:11:42 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/28 18:14:52 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,8 @@ int	main(int argc, char **argv)
 			}
 			dir[i -1] = ft_atoi(argv[i]);
 		}
-		lyceum(dir, argc - 1);
+		if (dir[0])
+			lyceum(dir, argc - 1);
 		return (0);
 	}
 	printf("ERROR: expected:./philo [#of philosophers] ");
