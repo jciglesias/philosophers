@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/26 00:01:45 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/29 11:55:56 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,19 @@ typedef struct s_philos
 	pthread_t		*philosopher;
 	pthread_mutex_t	*mutex;
 	long			start;
+	pthread_mutex_t	start_m;
 	int				n_forks;
 	int				n_to_eat;
 	long			t_to_die;
 	long			t_to_eat;
 	long			t_to_sleep;
+	pthread_mutex_t	dir_m;
 	int				pos;
+	pthread_mutex_t	pos_m;
 	int				alive;
+	pthread_mutex_t	alive_m;
 	long			*starve;
+	pthread_mutex_t	*starve_m;
 	int				lunchs;
 }	t_philo;
 
@@ -41,6 +46,7 @@ int		intmaxmin(char *str);
 int		ft_strlen(char *str);
 void	*kill_philosopher(t_philo *p, int pos, long time);
 void	*life(void *p);
-long	time_ms(struct timeval time);
+long	time_ms(t_philo *p);
+int		checkalive(t_philo	*p);
 
 #endif
