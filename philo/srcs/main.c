@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/29 17:04:14 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/29 21:35:55 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,10 @@ void	lyceum(int *dir, int size)
 	t_philoinit(&p, dir, size);
 	i = 0;
 	while (i < dir[0])
-		pthread_mutex_init(&(p.mutex[i++]), NULL);
+	{
+		pthread_mutex_init(&(p.mutex[i]), NULL);
+		pthread_mutex_init(&(p.starve_m[i++]), NULL);
+	}
 	i = 0;
 	gettimeofday(&time, NULL);
 	p.start = (time.tv_sec * 1000) + (time.tv_usec / 1000);
@@ -106,6 +109,7 @@ void	lyceum(int *dir, int size)
 	free(p.philosopher);
 	free(p.mutex);
 	free(p.starve);
+	free(p.starve_m);
 }
 
 int	main(int argc, char **argv)
