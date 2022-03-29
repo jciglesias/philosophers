@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/29 11:55:56 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/29 17:02:35 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_philos
 	long			*starve;
 	pthread_mutex_t	*starve_m;
 	int				lunchs;
+	pthread_mutex_t	print_m;
 }	t_philo;
 
 int		ft_atoi(char *str);

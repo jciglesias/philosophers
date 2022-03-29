@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/29 12:59:08 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/29 17:04:14 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ void	*kill_philosopher(t_philo *p, int pos, long time)
 	pthread_mutex_lock(&p->alive_m);
 	p->alive = 0;
 	pthread_mutex_unlock(&p->alive_m);
+	pthread_mutex_lock(&p->print_m);
 	printf("%ld %d died\n", time, pos + 1);
+	pthread_mutex_unlock(&p->print_m);
 	return (0);
 }
 
@@ -41,6 +43,7 @@ void	t_philoinit(t_philo *p, int *dir, int size)
 	pthread_mutex_init(&p->pos_m, NULL);
 	pthread_mutex_init(&p->start_m, NULL);
 	pthread_mutex_init(&p->dir_m, NULL);
+	pthread_mutex_init(&p->print_m, NULL);
 }
 
 void	livecheck(t_philo *p, struct timeval time)

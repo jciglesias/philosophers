@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/29 12:49:02 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/29 17:02:01 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,25 +41,46 @@ int	time_to_eat(t_philo *tmp, int pos, int *dir)
 {
 	if (!checkalive(tmp))
 		return (1);
-	pthread_mutex_lock(&tmp->mutex[pos]);
+	if (pos % 2)
+		pthread_mutex_lock(&tmp->mutex[pos]);
+	else
+	{
+		if (pos < (dir[0] - 1))
+			pthread_mutex_lock(&tmp->mutex[pos + 1]);
+		else
+			pthread_mutex_lock(&tmp->mutex[0]);
+	}
 	if (checkalive(tmp))
+	{
+		pthread_mutex_lock(&tmp->print_m);
 		printf("%ld %d has taken a fork\n", time_ms(tmp), pos + 1);
+		pthread_mutex_unlock(&tmp->print_m);
+	}
 	if (dir[0] < 2)
 	{
 		usleep(dir[1] * 1000);
 		return (1);
 	}
-	if (pos < (dir[0] - 1))
-		pthread_mutex_lock(&tmp->mutex[pos + 1]);
+	if (pos % 2)
+	{
+		if (pos < (dir[0] - 1))
+			pthread_mutex_lock(&tmp->mutex[pos + 1]);
+		else
+			pthread_mutex_lock(&tmp->mutex[0]);
+	}
 	else
-		pthread_mutex_lock(&tmp->mutex[0]);
+		pthread_mutex_lock(&tmp->mutex[pos]);
 	if (checkalive(tmp))
 	{
+		pthread_mutex_lock(&tmp->print_m);
 		printf("%ld %d has taken a fork\n", time_ms(tmp), pos + 1);
+		pthread_mutex_unlock(&tmp->print_m);
 		pthread_mutex_lock(&tmp->starve_m[pos]);
 		tmp->starve[pos] = time_ms(tmp);
 		pthread_mutex_unlock(&tmp->starve_m[pos]);
+		pthread_mutex_lock(&tmp->print_m);
 		printf("%ld %d is eating\n", time_ms(tmp), pos + 1);
+		pthread_mutex_unlock(&tmp->print_m);
 	}
 	return (0);
 }
@@ -68,7 +89,11 @@ int	after_meal(t_philo *tmp, int pos, int *dir)
 {
 	usleep(dir[2] * 1000);
 	if (checkalive(tmp))
+	{
+		pthread_mutex_lock(&tmp->print_m);
 		printf("%ld %d is sleeping\n", time_ms(tmp), pos + 1);
+		pthread_mutex_unlock(&tmp->print_m);
+	}
 	pthread_mutex_unlock(&tmp->mutex[pos]);
 	if (pos < (dir[0] - 1))
 		pthread_mutex_unlock(&tmp->mutex[pos + 1]);
@@ -87,7 +112,11 @@ int	after_meal(t_philo *tmp, int pos, int *dir)
 	if (!checkalive(tmp))
 		return (1);
 	if (checkalive(tmp))
+	{
+		pthread_mutex_lock(&tmp->print_m);
 		printf("%ld %d is thinking\n", time_ms(tmp), pos + 1);
+		pthread_mutex_unlock(&tmp->print_m);
+	}
 	return (0);
 }
 
