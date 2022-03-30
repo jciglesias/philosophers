@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/29 21:35:55 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/03/30 18:41:05 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,15 @@
 
 void	*kill_philosopher(t_philo *p, int pos, long time)
 {
-	pthread_mutex_lock(&p->alive_m);
-	p->alive = 0;
-	pthread_mutex_unlock(&p->alive_m);
+	int	i;
+
+	i = 0;
+	while (i < p->n_forks)
+	{
+		pthread_mutex_lock(&p->alive_m[i]);
+		p->alive[i] = 0;
+		pthread_mutex_unlock(&p->alive_m[i++]);
+	}
 	pthread_mutex_lock(&p->print_m);
 	printf("%ld %d died\n", time, pos + 1);
 	pthread_mutex_unlock(&p->print_m);
@@ -25,6 +31,9 @@ void	*kill_philosopher(t_philo *p, int pos, long time)
 
 void	t_philoinit(t_philo *p, int *dir, int size)
 {
+	int	i;
+
+	i = 0;
 	p->n_forks = dir[0];
 	p->t_to_die = dir[1];
 	p->t_to_eat = dir[2];
@@ -36,14 +45,17 @@ void	t_philoinit(t_philo *p, int *dir, int size)
 	p->mutex = malloc(sizeof(pthread_mutex_t) * dir[0]);
 	p->starve = malloc(sizeof(long) * dir[0]);
 	p->starve_m = malloc(sizeof(pthread_mutex_t) * dir[0]);
-	p->alive = 1;
-	pthread_mutex_init(&p->alive_m, NULL);
+	p->alive = malloc(sizeof(int) * dir[0]);
+	while (i < dir[0])
+		p->alive[i++] = 1;
+	p->alive_m = malloc(sizeof(pthread_mutex_t) * dir[0]);
 	p->lunchs = 1;
 	p->pos = 0;
 	pthread_mutex_init(&p->pos_m, NULL);
 	pthread_mutex_init(&p->start_m, NULL);
 	pthread_mutex_init(&p->dir_m, NULL);
 	pthread_mutex_init(&p->print_m, NULL);
+	pthread_mutex_init(&p->lunch_m, NULL);
 }
 
 void	livecheck(t_philo *p, struct timeval time)
@@ -56,8 +68,10 @@ void	livecheck(t_philo *p, struct timeval time)
 	dir[0] = p->n_forks;
 	dir[1] = p->t_to_die;
 	pthread_mutex_unlock(&p->dir_m);
-	while (checkalive(p) && p->lunchs)
+	pthread_mutex_lock(&p->lunch_m);
+	while (checkalive(p, 0) && p->lunchs)
 	{
+		pthread_mutex_unlock(&p->lunch_m);
 		i = 0;
 		while (i < dir[0])
 		{
@@ -66,16 +80,15 @@ void	livecheck(t_philo *p, struct timeval time)
 			if ((time_ms(p) - p->starve[i]) > (dir[1]))
 			{
 				pthread_mutex_unlock(&p->starve_m[i]);
-				pthread_mutex_lock(&p->alive_m);
-				p->alive = 0;
-				pthread_mutex_unlock(&p->alive_m);
 				kill_philosopher(p, i, time_ms(p));
 				break ;
 			}
 			pthread_mutex_unlock(&p->starve_m[i]);
 			i++;
 		}
+		pthread_mutex_lock(&p->lunch_m);
 	}
+	pthread_mutex_unlock(&p->lunch_m);
 }
 
 void	lyceum(int *dir, int size)
@@ -89,18 +102,16 @@ void	lyceum(int *dir, int size)
 	while (i < dir[0])
 	{
 		pthread_mutex_init(&(p.mutex[i]), NULL);
-		pthread_mutex_init(&(p.starve_m[i++]), NULL);
+		pthread_mutex_init(&(p.starve_m[i]), NULL);
+		pthread_mutex_init(&p.alive_m[i++], NULL);
 	}
 	i = 0;
 	gettimeofday(&time, NULL);
 	p.start = (time.tv_sec * 1000) + (time.tv_usec / 1000);
 	while (i < dir[0])
 	{
-		pthread_mutex_lock(&p.starve_m[i]);
 		p.starve[i] = time_ms(&p);
-		pthread_mutex_unlock(&p.starve_m[i]);
 		pthread_create(&p.philosopher[i++], NULL, &life, &p);
-		usleep(10);
 	}
 	livecheck(&p, time);
 	i = 0;
@@ -110,6 +121,8 @@ void	lyceum(int *dir, int size)
 	free(p.mutex);
 	free(p.starve);
 	free(p.starve_m);
+	free(p.alive);
+	free(p.alive_m);
 }
 
 int	main(int argc, char **argv)
