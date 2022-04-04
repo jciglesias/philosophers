@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/30 18:41:05 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/04 12:50:51 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ void	t_philoinit(t_philo *p, int *dir, int size)
 	while (i < dir[0])
 		p->alive[i++] = 1;
 	p->alive_m = malloc(sizeof(pthread_mutex_t) * dir[0]);
+	p->turn = malloc(sizeof(int) * dir[0]);
+	p->turn_m = malloc(sizeof(pthread_mutex_t) * dir[0]);
 	p->lunchs = 1;
 	p->pos = 0;
 	pthread_mutex_init(&p->pos_m, NULL);
@@ -103,7 +105,8 @@ void	lyceum(int *dir, int size)
 	{
 		pthread_mutex_init(&(p.mutex[i]), NULL);
 		pthread_mutex_init(&(p.starve_m[i]), NULL);
-		pthread_mutex_init(&p.alive_m[i++], NULL);
+		pthread_mutex_init(&p.alive_m[i], NULL);
+		pthread_mutex_init(&p.turn_m[i++], NULL);
 	}
 	i = 0;
 	gettimeofday(&time, NULL);
@@ -111,6 +114,10 @@ void	lyceum(int *dir, int size)
 	while (i < dir[0])
 	{
 		p.starve[i] = time_ms(&p);
+		if (!(i % 2))
+			p.turn[i] = 0;
+		else
+			p.turn[i] = 1;
 		pthread_create(&p.philosopher[i++], NULL, &life, &p);
 	}
 	livecheck(&p, time);

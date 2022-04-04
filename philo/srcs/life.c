@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/03/30 18:41:31 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/04 21:36:15 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,25 @@ int	time_to_eat(t_philo *tmp, int pos, int *dir)
 	return (0);
 }
 
+void	nextturn(t_philo *p, int pos, int n_forks)
+{
+	if (0 == pos)
+	{
+		pthread_mutex_lock(&p->turn_m[n_forks - 1]);
+		p->turn[n_forks - 1] = 1;
+		pthread_mutex_unlock(&p->turn_m[n_forks - 1]);
+	}
+	else
+	{
+		pthread_mutex_lock(&p->turn_m[pos - 1]);
+		p->turn[pos - 1] = 1;
+		pthread_mutex_unlock(&p->turn_m[pos - 1]);
+	}
+	pthread_mutex_lock(&p->turn_m[pos]);
+	p->turn[pos] = 0;
+	pthread_mutex_unlock(&p->turn_m[pos]);
+}
+
 int	after_meal(t_philo *tmp, int pos, int *dir)
 {
 	long	time;
@@ -101,9 +120,10 @@ int	after_meal(t_philo *tmp, int pos, int *dir)
 
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
-	while ((new_time - time) < dir[2])
+	while ((new_time - time) <= dir[2])
 		new_time = time_ms(tmp);
 	printline(tmp, pos, "is sleeping\n");
+	nextturn(tmp, pos, dir[0]);
 	pthread_mutex_unlock(&tmp->mutex[pos]);
 	if (pos < (dir[0] - 1))
 		pthread_mutex_unlock(&tmp->mutex[pos + 1]);
@@ -111,12 +131,23 @@ int	after_meal(t_philo *tmp, int pos, int *dir)
 		pthread_mutex_unlock(&tmp->mutex[0]);
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
-	while ((new_time - time) < dir[3])
+	while ((new_time - time) <= dir[3])
 		new_time = time_ms(tmp);
 	if (!checkalive(tmp, pos))
 		return (1);
 	printline(tmp, pos, "is thinking\n");
 	return (0);
+}
+
+void	checkturn(t_philo *p, int pos)
+{
+	pthread_mutex_lock(&p->turn_m[pos]);
+	while (!p->turn[pos])
+	{
+		pthread_mutex_unlock(&p->turn_m[pos]);
+		pthread_mutex_lock(&p->turn_m[pos]);
+	}
+	pthread_mutex_unlock(&p->turn_m[pos]);
 }
 
 void	*life(void *p)
@@ -136,6 +167,8 @@ void	*life(void *p)
 	pthread_mutex_unlock(&tmp->dir_m);
 	while (dir[4])
 	{
+		if (dir[0] > 1)
+			checkturn(tmp, pos);
 		if (time_to_eat(tmp, pos, dir))
 			return (0);
 		dir[4]--;
