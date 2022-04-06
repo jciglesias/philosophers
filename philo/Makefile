@@ -6,7 +6,7 @@
 #    By: jiglesia <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/11/09 12:55:34 by jiglesia          #+#    #+#              #
-#    Updated: 2022/03/21 11:22:02 by jiglesia         ###   ########.fr        #
+#    Updated: 2022/04/05 17:16:00 by jiglesia         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -35,7 +35,7 @@ DIRLIST		=
 DIRQ_SORT	=
 DIRLASER	=
 
-SRC			=	main.c libft.c life.c
+SRC			=	main.c libft.c life.c life_tools.c structinit.c
 CHECKER		=
 MOVES		=
 INPUT		=

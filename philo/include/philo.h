@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/04 11:00:58 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/05 17:14:58 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,9 @@ void	*kill_philosopher(t_philo *p, int pos, long time);
 void	*life(void *p);
 long	time_ms(t_philo *p);
 int		checkalive(t_philo	*p, int pos);
+void	checkturn(t_philo *p, int pos);
+void	takefork(t_philo *tmp, int pos, int philos, int side);
+void	printline(t_philo *tmp, int pos, char *str);
+void	t_philoinit(t_philo *p, int *dir, int size);
 
 #endif
