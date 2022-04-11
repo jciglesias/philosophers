@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 14:05:42 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 14:46:53 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 17:46:57 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,10 +76,21 @@ void	takefork(t_table *tmp, int pos, int philos, int side)
 void	checkturn(t_philo *p)
 {
 	pthread_mutex_lock(&p->turn_m);
-	while (!p->turn)
+	if (!p->turn)
 	{
 		pthread_mutex_unlock(&p->turn_m);
-		pthread_mutex_lock(&p->turn_m);
+		usleep(10);
 	}
-	pthread_mutex_unlock(&p->turn_m);
+	else
+		pthread_mutex_unlock(&p->turn_m);
 }
+
+
+
+
+
+
+
+
+
+
