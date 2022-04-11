@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 15:15:14 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 16:32:06 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	after_meal(t_table *tmp, int pos)
 
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
-	while ((new_time - time) <= tmp->philo[pos].t_to_eat)
+	while ((new_time - time) < tmp->philo[pos].t_to_eat)
 		new_time = time_ms(tmp);
 	printline(tmp, pos, "is sleeping\n");
 	nextturn(tmp, pos, tmp->philo[pos].n_forks);
@@ -73,7 +73,7 @@ int	after_meal(t_table *tmp, int pos)
 		pthread_mutex_unlock(&tmp->mutex[0]);
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
-	while ((new_time - time) <= tmp->philo[pos].t_to_sleep)
+	while ((new_time - time) < tmp->philo[pos].t_to_sleep)
 		new_time = time_ms(tmp);
 	if (!checkalive(&tmp->philo[pos]))
 		return (1);
