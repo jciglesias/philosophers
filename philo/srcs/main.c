@@ -6,39 +6,33 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 12:56:46 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 15:30:19 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	philoscheck(t_philo *p, int i, struct timeval time, int *dir)
+void	philoscheck(t_table *p, int i, struct timeval time, int *dir)
 {
 	while (i < dir[0])
 	{
 		gettimeofday(&time, NULL);
-		pthread_mutex_lock(&p->starve_m[i]);
-		if ((time_ms(p) - p->starve[i]) > (dir[1]))
+		pthread_mutex_lock(&p->philo[i].starve_m);
+		if ((time_ms(p) - p->philo[i].starve) > (dir[1]))
 		{
-			pthread_mutex_unlock(&p->starve_m[i]);
+			pthread_mutex_unlock(&p->philo[i].starve_m);
 			kill_philosopher(p, i, time_ms(p));
 			return ;
 		}
-		pthread_mutex_unlock(&p->starve_m[i]);
+		pthread_mutex_unlock(&p->philo[i].starve_m);
 		i++;
 	}
 }
 
-void	livecheck(t_philo *p, struct timeval time)
+void	livecheck(t_table *p, struct timeval time, int *dir)
 {
-	int	dir[2];
-
-	pthread_mutex_lock(&p->dir_m);
-	dir[0] = p->n_forks;
-	dir[1] = p->t_to_die;
-	pthread_mutex_unlock(&p->dir_m);
 	pthread_mutex_lock(&p->lunch_m);
-	while (checkalive(p, 0) && p->lunchs)
+	while (checkalive(&p->philo[0]) && p->lunchs)
 	{
 		pthread_mutex_unlock(&p->lunch_m);
 		philoscheck(p, 0, time, dir);
@@ -47,41 +41,28 @@ void	livecheck(t_philo *p, struct timeval time)
 	pthread_mutex_unlock(&p->lunch_m);
 }
 
-void	freephilos(t_philo *p)
+void	freephilos(t_table *p)
 {
-	free(p->philosopher);
+	free(p->philo);
 	free(p->mutex);
-	free(p->starve);
-	free(p->starve_m);
-	free(p->alive);
-	free(p->alive_m);
-	free(p->turn);
-	free(p->turn_m);
 }
 
 void	lyceum(int *dir, int size)
 {
 	int				i;
-	t_philo			p;
+	t_table			p;
 	struct timeval	time;
 
-	t_philoinit(&p, dir, size);
+	t_tableinit(&p, dir, size);
 	i = 0;
 	gettimeofday(&time, NULL);
 	p.start = (time.tv_sec * 1000) + (time.tv_usec / 1000);
 	while (i < dir[0])
-	{
-		p.starve[i] = time_ms(&p);
-		if (!(i % 2))
-			p.turn[i] = 0;
-		else
-			p.turn[i] = 1;
-		pthread_create(&p.philosopher[i++], NULL, &life, &p);
-	}
-	livecheck(&p, time);
+		pthread_create(&p.philo[i++].philosopher, NULL, &life, &p);
+	livecheck(&p, time, dir);
 	i = 0;
 	while (i < dir[0])
-		pthread_join(p.philosopher[i++], NULL);
+		pthread_join(p.philo[i++].philosopher, NULL);
 	freephilos(&p);
 }
 

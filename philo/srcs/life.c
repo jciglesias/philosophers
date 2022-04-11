@@ -6,112 +6,101 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/05 17:21:19 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 15:15:14 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	nextturn(t_philo *p, int pos, int n_forks)
+void	nextturn(t_table *p, int pos, int n_forks)
 {
 	if (pos == 0)
 	{
-		pthread_mutex_lock(&p->turn_m[n_forks - 1]);
-		p->turn[n_forks - 1] = 1;
-		pthread_mutex_unlock(&p->turn_m[n_forks - 1]);
+		pthread_mutex_lock(&p->philo[n_forks - 1].turn_m);
+		p->philo[n_forks - 1].turn = 1;
+		pthread_mutex_unlock(&p->philo[n_forks - 1].turn_m);
 	}
 	else
 	{
-		pthread_mutex_lock(&p->turn_m[pos - 1]);
-		p->turn[pos - 1] = 1;
-		pthread_mutex_unlock(&p->turn_m[pos - 1]);
+		pthread_mutex_lock(&p->philo[pos - 1].turn_m);
+		p->philo[pos - 1].turn = 1;
+		pthread_mutex_unlock(&p->philo[pos - 1].turn_m);
 	}
-	pthread_mutex_lock(&p->turn_m[pos]);
-	p->turn[pos] = 0;
-	pthread_mutex_unlock(&p->turn_m[pos]);
+	pthread_mutex_lock(&p->philo[pos].turn_m);
+	p->philo[pos].turn = 0;
+	pthread_mutex_unlock(&p->philo[pos].turn_m);
 }
 
-int	time_to_eat(t_philo *tmp, int pos, int *dir)
+int	time_to_eat(t_table *tmp, int pos)
 {
-	if (!checkalive(tmp, pos))
+	if (!checkalive(&tmp->philo[pos]))
 	{
-		nextturn(tmp, pos, dir[0]);
+		nextturn(tmp, pos, tmp->philo[pos].n_forks);
 		return (1);
 	}
-	takefork(tmp, pos, dir[0], 0);
+	takefork(tmp, pos, tmp->philo[pos].n_forks, 0);
 	printline(tmp, pos, "has taken a fork\n");
-	if (dir[0] < 2)
+	if (tmp->philo[pos].n_forks < 2)
 	{
 		pthread_mutex_unlock(&tmp->mutex[pos]);
-		usleep(dir[1] * 1000);
+		usleep(tmp->philo[pos].t_to_die * 1000);
 		return (1);
 	}
-	takefork(tmp, pos, dir[0], 1);
+	takefork(tmp, pos, tmp->philo[pos].n_forks, 1);
 	printline(tmp, pos, "has taken a fork\n");
-	pthread_mutex_lock(&tmp->starve_m[pos]);
-	tmp->starve[pos] = time_ms(tmp);
-	pthread_mutex_unlock(&tmp->starve_m[pos]);
+	pthread_mutex_lock(&tmp->philo[pos].starve_m);
+	tmp->philo[pos].starve = time_ms(tmp);
+	pthread_mutex_unlock(&tmp->philo[pos].starve_m);
 	printline(tmp, pos, "is eating\n");
 	return (0);
 }
 
-int	after_meal(t_philo *tmp, int pos, int *dir)
+int	after_meal(t_table *tmp, int pos)
 {
 	long	time;
 	long	new_time;
 
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
-	while ((new_time - time) <= dir[2])
+	while ((new_time - time) <= tmp->philo[pos].t_to_eat)
 		new_time = time_ms(tmp);
 	printline(tmp, pos, "is sleeping\n");
-	nextturn(tmp, pos, dir[0]);
+	nextturn(tmp, pos, tmp->philo[pos].n_forks);
 	pthread_mutex_unlock(&tmp->mutex[pos]);
-	if (pos < (dir[0] - 1))
+	if (pos < (tmp->philo[pos].n_forks - 1))
 		pthread_mutex_unlock(&tmp->mutex[pos + 1]);
 	else
 		pthread_mutex_unlock(&tmp->mutex[0]);
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
-	while ((new_time - time) <= dir[3])
+	while ((new_time - time) <= tmp->philo[pos].t_to_sleep)
 		new_time = time_ms(tmp);
-	if (!checkalive(tmp, pos))
+	if (!checkalive(&tmp->philo[pos]))
 		return (1);
 	printline(tmp, pos, "is thinking\n");
 	return (0);
 }
 
-int	dirinit(t_philo *p, int *dir)
-{
-	dir[0] = p->n_forks;
-	dir[1] = p->t_to_die;
-	dir[2] = p->t_to_eat;
-	dir[3] = p->t_to_sleep;
-	dir[4] = p->n_to_eat;
-	return (p->pos++);
-}
-
 void	*life(void *p)
 {
-	t_philo			*tmp;
+	t_table			*tmp;
 	int				pos;
-	int				dir[5];
 
-	tmp = (t_philo *)p;
-	pthread_mutex_lock(&tmp->dir_m);
-	pos = dirinit(tmp, dir);
-	pthread_mutex_unlock(&tmp->dir_m);
-	while (dir[4])
+	tmp = (t_table *)p;
+	pthread_mutex_lock(&tmp->pos_m);
+	pos = tmp->pos++;
+	pthread_mutex_unlock(&tmp->pos_m);
+	while (tmp->philo[pos].n_to_eat)
 	{
-		if (dir[0] > 1)
-			checkturn(tmp, pos);
-		if (time_to_eat(tmp, pos, dir))
+		if (tmp->philo[pos].n_forks > 1)
+			checkturn(&tmp->philo[pos]);
+		if (time_to_eat(tmp, pos))
 			return (0);
-		dir[4]--;
-		if (after_meal(tmp, pos, dir))
+		tmp->philo[pos].n_to_eat--;
+		if (after_meal(tmp, pos))
 			return (0);
 	}
-	if (!dir[4])
+	if (!tmp->philo[pos].n_to_eat)
 	{
 		pthread_mutex_lock(&tmp->lunch_m);
 		tmp->lunchs = 0;

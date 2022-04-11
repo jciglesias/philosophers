@@ -6,13 +6,13 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 14:05:42 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/05 14:07:03 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 14:46:53 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	time_ms(t_philo *p)
+long	time_ms(t_table *p)
 {
 	struct timeval	time;
 	long			a;
@@ -25,27 +25,27 @@ long	time_ms(t_philo *p)
 	return (a);
 }
 
-int	checkalive(t_philo	*p, int pos)
+int	checkalive(t_philo	*p)
 {
-	pthread_mutex_lock(&p->alive_m[pos]);
-	if (p->alive[pos])
+	pthread_mutex_lock(&p->alive_m);
+	if (p->alive)
 	{
-		pthread_mutex_unlock(&p->alive_m[pos]);
+		pthread_mutex_unlock(&p->alive_m);
 		return (1);
 	}
-	pthread_mutex_unlock(&p->alive_m[pos]);
+	pthread_mutex_unlock(&p->alive_m);
 	return (0);
 }
 
-void	printline(t_philo *tmp, int pos, char *str)
+void	printline(t_table *tmp, int pos, char *str)
 {
 	pthread_mutex_lock(&tmp->print_m);
-	if (checkalive(tmp, pos))
+	if (checkalive(&tmp->philo[pos]))
 		printf("%ld %d %s", time_ms(tmp), pos + 1, str);
 	pthread_mutex_unlock(&tmp->print_m);
 }
 
-void	takefork(t_philo *tmp, int pos, int philos, int side)
+void	takefork(t_table *tmp, int pos, int philos, int side)
 {
 	if (!side)
 	{
@@ -73,13 +73,13 @@ void	takefork(t_philo *tmp, int pos, int philos, int side)
 	}
 }
 
-void	checkturn(t_philo *p, int pos)
+void	checkturn(t_philo *p)
 {
-	pthread_mutex_lock(&p->turn_m[pos]);
-	while (!p->turn[pos])
+	pthread_mutex_lock(&p->turn_m);
+	while (!p->turn)
 	{
-		pthread_mutex_unlock(&p->turn_m[pos]);
-		pthread_mutex_lock(&p->turn_m[pos]);
+		pthread_mutex_unlock(&p->turn_m);
+		pthread_mutex_lock(&p->turn_m);
 	}
-	pthread_mutex_unlock(&p->turn_m[pos]);
+	pthread_mutex_unlock(&p->turn_m);
 }

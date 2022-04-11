@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 19:38:45 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/05 17:14:58 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 15:13:35 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,40 +21,45 @@
 
 typedef struct s_philos
 {
-	pthread_t		*philosopher;
-	pthread_mutex_t	*mutex;
-	long			start;
-	pthread_mutex_t	start_m;
+	pthread_t		philosopher;
 	int				n_forks;
 	int				n_to_eat;
 	long			t_to_die;
 	long			t_to_eat;
 	long			t_to_sleep;
-	pthread_mutex_t	dir_m;
+	int				alive;
+	pthread_mutex_t	alive_m;
+	long			starve;
+	pthread_mutex_t	starve_m;
+	int				turn;
+	pthread_mutex_t	turn_m;
+}	t_philo;
+
+typedef struct s_table
+{
+	t_philo			*philo;
+	pthread_mutex_t	*mutex;
+	int				n_forks;
+	long			start;
+	pthread_mutex_t	start_m;
 	int				pos;
 	pthread_mutex_t	pos_m;
-	int				*alive;
-	pthread_mutex_t	*alive_m;
-	long			*starve;
-	pthread_mutex_t	*starve_m;
 	int				lunchs;
-	int				*turn;
-	pthread_mutex_t	*turn_m;
 	pthread_mutex_t	lunch_m;
 	pthread_mutex_t	print_m;
-}	t_philo;
+}	t_table;
 
 int		ft_atoi(char *str);
 int		ft_isdigit(char *str);
 int		intmaxmin(char *str);
 int		ft_strlen(char *str);
-void	*kill_philosopher(t_philo *p, int pos, long time);
+void	*kill_philosopher(t_table *p, int pos, long time);
 void	*life(void *p);
-long	time_ms(t_philo *p);
-int		checkalive(t_philo	*p, int pos);
-void	checkturn(t_philo *p, int pos);
-void	takefork(t_philo *tmp, int pos, int philos, int side);
-void	printline(t_philo *tmp, int pos, char *str);
-void	t_philoinit(t_philo *p, int *dir, int size);
+long	time_ms(t_table *p);
+int		checkalive(t_philo	*p);
+void	checkturn(t_philo *p);
+void	takefork(t_table *tmp, int pos, int philos, int side);
+void	printline(t_table *tmp, int pos, char *str);
+void	t_tableinit(t_table *p, int *dir, int size);
 
 #endif
