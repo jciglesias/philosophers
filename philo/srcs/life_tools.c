@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 14:05:42 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 17:46:57 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 18:23:31 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,18 +79,8 @@ void	checkturn(t_philo *p)
 	if (!p->turn)
 	{
 		pthread_mutex_unlock(&p->turn_m);
-		usleep(10);
+		usleep((p->t_to_eat * 1000) + 10);
 	}
 	else
 		pthread_mutex_unlock(&p->turn_m);
 }
-
-
-
-
-
-
-
-
-
-

@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 17:47:44 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 18:16:45 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,10 @@ void	*life(void *p)
 	pthread_mutex_lock(&tmp->pos_m);
 	pos = tmp->pos++;
 	pthread_mutex_unlock(&tmp->pos_m);
+	if (tmp->philo[pos].n_forks > 1)
+		checkturn(&tmp->philo[pos]);
 	while (tmp->philo[pos].n_to_eat)
 	{
-		if (tmp->philo[pos].n_forks > 1)
-			checkturn(&tmp->philo[pos]);
 		if (time_to_eat(tmp, pos))
 			return (0);
 		tmp->philo[pos].n_to_eat--;
