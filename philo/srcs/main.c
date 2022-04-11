@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/05 17:14:45 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 12:56:46 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	lyceum(int *dir, int size)
 	i = 0;
 	while (i < dir[0])
 		pthread_join(p.philosopher[i++], NULL);
+	freephilos(&p);
 }
 
 int	main(int argc, char **argv)
