@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 18:16:45 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 22:26:13 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,10 @@ int	after_meal(t_table *tmp, int pos)
 	printline(tmp, pos, "is sleeping\n");
 	nextturn(tmp, pos, tmp->philo[pos].n_forks);
 	pthread_mutex_unlock(&tmp->mutex[pos]);
-	if (pos < (tmp->philo[pos].n_forks - 1))
-		pthread_mutex_unlock(&tmp->mutex[pos + 1]);
+	if (pos == 0)
+		pthread_mutex_unlock(&tmp->mutex[tmp->philo[pos].n_forks - 1]);
 	else
-		pthread_mutex_unlock(&tmp->mutex[0]);
+		pthread_mutex_unlock(&tmp->mutex[pos - 1]);
 	time = time_ms(tmp);
 	new_time = time_ms(tmp);
 	while ((new_time - time) <= tmp->philo[pos].t_to_sleep)
@@ -91,7 +91,7 @@ void	*life(void *p)
 	pos = tmp->pos++;
 	pthread_mutex_unlock(&tmp->pos_m);
 	if (tmp->philo[pos].n_forks > 1)
-		checkturn(&tmp->philo[pos]);
+		checkturn(&tmp->philo[pos], 0);
 	while (tmp->philo[pos].n_to_eat)
 	{
 		if (time_to_eat(tmp, pos))

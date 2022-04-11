@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 14:05:42 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 18:23:31 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/11 23:20:05 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,33 +53,32 @@ void	takefork(t_table *tmp, int pos, int philos, int side)
 			pthread_mutex_lock(&tmp->mutex[pos]);
 		else
 		{
-			if (pos < (philos - 1))
-				pthread_mutex_lock(&tmp->mutex[pos + 1]);
+			if (pos == 0)
+				pthread_mutex_lock(&tmp->mutex[philos - 1]);
 			else
-				pthread_mutex_lock(&tmp->mutex[0]);
+				pthread_mutex_lock(&tmp->mutex[pos - 1]);
 		}
 	}
 	else
 	{
+		checkturn(&tmp->philo[pos], 1);
 		if (pos % 2)
-		{
-			if (pos < (philos - 1))
-				pthread_mutex_lock(&tmp->mutex[pos + 1]);
-			else
-				pthread_mutex_lock(&tmp->mutex[0]);
-		}
+			pthread_mutex_lock(&tmp->mutex[pos - 1]);
 		else
 			pthread_mutex_lock(&tmp->mutex[pos]);
 	}
 }
 
-void	checkturn(t_philo *p)
+void	checkturn(t_philo *p, int e)
 {
 	pthread_mutex_lock(&p->turn_m);
 	if (!p->turn)
 	{
 		pthread_mutex_unlock(&p->turn_m);
-		usleep((p->t_to_eat * 1000) + 10);
+		if (!e)
+			usleep((p->t_to_eat * 1000) + 10);
+		else
+			usleep(1000);
 	}
 	else
 		pthread_mutex_unlock(&p->turn_m);
