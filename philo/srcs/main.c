@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/12 19:02:02 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/12 19:47:27 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void	livecheck(t_table *p, struct timeval time, int *dir)
 	{
 		pthread_mutex_unlock(&p->lunch_m);
 		alive = philoscheck(p, 0, time, dir);
+		usleep(2000);
 		pthread_mutex_lock(&p->lunch_m);
 	}
 	pthread_mutex_unlock(&p->lunch_m);
