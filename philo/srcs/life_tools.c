@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 14:05:42 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 23:20:05 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/12 15:58:34 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void	printline(t_table *tmp, int pos, char *str)
 
 void	takefork(t_table *tmp, int pos, int philos, int side)
 {
+	checkturn(&tmp->philo[pos], 1);
 	if (!side)
 	{
 		if (pos % 2)
@@ -61,7 +62,6 @@ void	takefork(t_table *tmp, int pos, int philos, int side)
 	}
 	else
 	{
-		checkturn(&tmp->philo[pos], 1);
 		if (pos % 2)
 			pthread_mutex_lock(&tmp->mutex[pos - 1]);
 		else
