@@ -6,13 +6,13 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/30 18:53:17 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/11 15:30:19 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/12 19:02:02 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	philoscheck(t_table *p, int i, struct timeval time, int *dir)
+int	philoscheck(t_table *p, int i, struct timeval time, int *dir)
 {
 	while (i < dir[0])
 	{
@@ -22,20 +22,24 @@ void	philoscheck(t_table *p, int i, struct timeval time, int *dir)
 		{
 			pthread_mutex_unlock(&p->philo[i].starve_m);
 			kill_philosopher(p, i, time_ms(p));
-			return ;
+			return (0);
 		}
 		pthread_mutex_unlock(&p->philo[i].starve_m);
 		i++;
 	}
+	return (1);
 }
 
 void	livecheck(t_table *p, struct timeval time, int *dir)
 {
+	int	alive;
+
+	alive = 1;
 	pthread_mutex_lock(&p->lunch_m);
-	while (checkalive(&p->philo[0]) && p->lunchs)
+	while (alive && p->lunchs)
 	{
 		pthread_mutex_unlock(&p->lunch_m);
-		philoscheck(p, 0, time, dir);
+		alive = philoscheck(p, 0, time, dir);
 		pthread_mutex_lock(&p->lunch_m);
 	}
 	pthread_mutex_unlock(&p->lunch_m);

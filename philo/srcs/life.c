@@ -6,7 +6,7 @@
 /*   By: jiglesia <jiglesia@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/21 11:19:28 by jiglesia          #+#    #+#             */
-/*   Updated: 2022/04/12 15:54:51 by jiglesia         ###   ########.fr       */
+/*   Updated: 2022/04/12 19:08:22 by jiglesia         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,15 +55,32 @@ int	time_to_eat(t_table *tmp, int pos)
 	return (0);
 }
 
+void	mysleep(long t)
+{
+	struct timeval	time;
+	long			start;
+	long			end;
+
+	gettimeofday(&time, NULL);
+	start = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+	end = start;
+	while ((end - start) < t)
+	{
+		gettimeofday(&time, NULL);
+		end = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+	}
+}
+
 int	after_meal(t_table *tmp, int pos)
 {
-	long	time;
-	long	new_time;
+//	long	time;
+//	long	new_time;
 
-	time = time_ms(tmp);
-	new_time = time_ms(tmp);
-	while ((new_time - time) <= tmp->philo[pos].t_to_eat)
-		new_time = time_ms(tmp);
+//	time = time_ms(tmp);
+//	new_time = time_ms(tmp);
+//	while ((new_time - time) < tmp->philo[pos].t_to_eat)
+//		new_time = time_ms(tmp);
+	mysleep(tmp->philo[pos].t_to_eat);
 	nextturn(tmp, pos, tmp->philo[pos].n_forks);
 	pthread_mutex_unlock(&tmp->mutex[pos]);
 	if (pos == 0)
@@ -71,10 +88,11 @@ int	after_meal(t_table *tmp, int pos)
 	else
 		pthread_mutex_unlock(&tmp->mutex[pos - 1]);
 	printline(tmp, pos, "is sleeping\n");
-	time = time_ms(tmp);
-	new_time = time_ms(tmp);
-	while ((new_time - time) <= tmp->philo[pos].t_to_sleep)
-		new_time = time_ms(tmp);
+	mysleep(tmp->philo[pos].t_to_sleep);
+//	time = time_ms(tmp);
+//	new_time = time_ms(tmp);
+//	while ((new_time - time) < tmp->philo[pos].t_to_sleep)
+//		new_time = time_ms(tmp);
 	if (!checkalive(&tmp->philo[pos]))
 		return (1);
 	printline(tmp, pos, "is thinking\n");
